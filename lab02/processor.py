@@ -15,16 +15,20 @@ class TextProcessor:
     def normalize_text(self, text):
         return re.sub(self.PATTERN, ' ', text).lower()
 
-    def normalize_file(self, file_path: str):
+    def clean_file(self, file_path: str):
         with open(file_path, "r") as my_file:
-            normalized_words = self.normalize_text(my_file.read()).split()
-            words = len(normalized_words)
-            return set(normalized_words), words
+            return self.normalize_text(my_file.read()).split()
+
+    def count_words_in_file(self, cleaned_file: list) -> int:
+        return len(cleaned_file)
 
     def process_files(self):
         file_counter = 1
+
         for file_path in self.file_paths:
-            unique_words, words_in_file = self.normalize_file(file_path)
+
+            unique_words = self.clean_file(file_path)
+            words_in_file = self.count_words_in_file(unique_words)
 
             for word in unique_words:
                 if word not in self.matrix:
@@ -32,7 +36,7 @@ class TextProcessor:
                     self.matrix[word] = [0] * self.file_number
 
                 # Update the list to indicate the presence of the word in the current file
-                self.matrix[word][file_counter - 1] += 1
+                self.matrix[word][file_counter - 1] = 1
 
             self.collection.update(unique_words)
             self.total_words += words_in_file
@@ -41,7 +45,10 @@ class TextProcessor:
             print(f"Done with {file_counter}")
             file_counter += 1
 
-    def save_matrix(self, output_file="matrix.txt"):
+        self.save_matrix()
+        self.print_summary()
+
+    def save_matrix(self, output_file="../lab02/matrix.txt"):
         with open(output_file, "w") as file:
             for key, value in self.matrix.items():
                 file.write(f"{key} -> {value}\n")
