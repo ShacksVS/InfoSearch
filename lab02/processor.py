@@ -1,5 +1,6 @@
 import re
 import os
+import time
 
 import pandas as pd
 
@@ -88,3 +89,98 @@ class TextProcessor:
         with open(output_file, "w") as file:
             for word in self.collection:
                 file.write(word + '\n')
+
+    def handle_and_operator(self, prompt: list):
+        first_word, second_word = prompt[0], prompt[2]
+
+        print(f"Finding {first_word} AND {second_word}..")
+
+        #
+        # finding in matrix
+        #
+
+        start_time_matrix = time.time()
+
+        found_files_in_matrix = self.matrix[first_word] or self.matrix[second_word]
+        time_matrix = (time.time() - start_time_matrix) * 1000  # convert to milliseconds
+
+        print(found_files_in_matrix, time_matrix)
+
+        #
+        # finding in inverted index
+        #
+
+        start_time_inverted = time.time()
+
+        found_files_in_inverted = self.inverted_index[first_word] or self.inverted_index[second_word]
+        time_inverted = (time.time() - start_time_inverted) * 1000  # convert to milliseconds
+
+        print(found_files_in_inverted, time_inverted)
+
+    def handle_or_operator(self, prompt):
+        first_word, second_word = prompt[0], prompt[2]
+
+        print(f"Finding {first_word} OR {second_word}..")
+
+        #
+        # finding in matrix
+        #
+
+        start_time_matrix = time.time()
+
+        found_files_in_matrix = self.matrix[first_word] and self.matrix[second_word]
+        time_matrix = (time.time() - start_time_matrix) * 1000  # convert to milliseconds
+
+        print(found_files_in_matrix, time_matrix)
+
+        #
+        # finding in inverted index
+        #
+
+        start_time_inverted = time.time()
+
+        found_files_in_inverted = self.inverted_index[first_word] and self.inverted_index[second_word]
+        time_inverted = (time.time() - start_time_inverted) * 1000  # convert to milliseconds
+
+        print(found_files_in_inverted, time_inverted)
+
+    def handle_not_operator(self, prompt):
+        not_word = prompt[1]
+        print(f"Finding not {not_word}..")
+
+        #
+        # finding in matrix
+        #
+
+        start_time_matrix = time.time()
+
+        if not_word in self.matrix:
+            found_files_in_matrix = [0] * self.file_number
+
+            for file_index, presence in enumerate(self.matrix[not_word]):
+                found_files_in_matrix[file_index] = 0 if presence == 1 else 1
+
+        else:
+            print("Word is not in collection")
+            return
+
+        time_matrix = (time.time() - start_time_matrix) * 1000  # convert to milliseconds
+
+        print(found_files_in_matrix, time_matrix)
+
+        #
+        # Finding in inverted index
+        #
+
+        start_time_inverted = time.time()
+        all_files = set(range(1, self.file_number + 1))
+
+        if not_word in self.inverted_index:
+            found_files_in_inverted = set(self.inverted_index[not_word])
+            found_files_in_inverted = all_files - found_files_in_inverted
+
+        else:
+            found_files_in_inverted = all_files
+
+        time_inverted = (time.time() - start_time_inverted) * 1000  # Convert to milliseconds
+        print(found_files_in_inverted, time_inverted)
