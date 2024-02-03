@@ -101,7 +101,15 @@ class TextProcessor:
 
         start_time_matrix = time.time()
 
-        found_files_in_matrix = self.matrix[first_word] or self.matrix[second_word]
+        found_files_in_matrix = list()
+
+        for i in range(0, self.file_number):
+            if self.matrix[first_word][i] == 1 and self.matrix[second_word][i] == 1:
+                found_files_in_matrix.append(1)
+            else:
+                found_files_in_matrix.append(0)
+
+        # found_files_in_matrix = self.matrix[first_word] or self.matrix[second_word]
         time_matrix = (time.time() - start_time_matrix) * 1000  # convert to milliseconds
 
         print(found_files_in_matrix, time_matrix)
@@ -112,7 +120,13 @@ class TextProcessor:
 
         start_time_inverted = time.time()
 
-        found_files_in_inverted = self.inverted_index[first_word] or self.inverted_index[second_word]
+        # using logical AND
+        found_files_in_inverted = list(set(self.inverted_index[first_word]) & set(self.inverted_index[second_word]))
+
+        # for i in range(0, self.file_number - 1):
+        #     if self.inverted_index[first_word][i] == 1 and self.inverted_index[second_word][i] == 1:
+        #         found_files_in_inverted.append(i)
+
         time_inverted = (time.time() - start_time_inverted) * 1000  # convert to milliseconds
 
         print(found_files_in_inverted, time_inverted)
@@ -128,7 +142,14 @@ class TextProcessor:
 
         start_time_matrix = time.time()
 
-        found_files_in_matrix = self.matrix[first_word] and self.matrix[second_word]
+        found_files_in_matrix = list()
+
+        for i in range(0, self.file_number):
+            if self.matrix[first_word][i] == 1 or self.matrix[second_word][i] == 1:
+                found_files_in_matrix.append(1)
+            else:
+                found_files_in_matrix.append(0)
+
         time_matrix = (time.time() - start_time_matrix) * 1000  # convert to milliseconds
 
         print(found_files_in_matrix, time_matrix)
@@ -139,7 +160,9 @@ class TextProcessor:
 
         start_time_inverted = time.time()
 
-        found_files_in_inverted = self.inverted_index[first_word] and self.inverted_index[second_word]
+        # using the logical OR operation
+        found_files_in_inverted = list(set(self.inverted_index[first_word]) | set(self.inverted_index[second_word]))
+
         time_inverted = (time.time() - start_time_inverted) * 1000  # convert to milliseconds
 
         print(found_files_in_inverted, time_inverted)
@@ -161,7 +184,7 @@ class TextProcessor:
                 found_files_in_matrix[file_index] = 0 if presence == 1 else 1
 
         else:
-            print("Word is not in collection")
+            print("Word is not in collections")
             return
 
         time_matrix = (time.time() - start_time_matrix) * 1000  # convert to milliseconds
@@ -169,11 +192,11 @@ class TextProcessor:
         print(found_files_in_matrix, time_matrix)
 
         #
-        # Finding in inverted index
+        # finding in inverted index
         #
 
-        start_time_inverted = time.time()
         all_files = set(range(1, self.file_number + 1))
+        start_time_inverted = time.time()
 
         if not_word in self.inverted_index:
             found_files_in_inverted = set(self.inverted_index[not_word])

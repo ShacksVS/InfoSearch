@@ -10,11 +10,11 @@ if __name__ == "__main__":
     while running:
         # prompt = input("-> ")
         # prompt = "київської AND в"
-        prompt = "not моринці"
+        prompt = "у or кобзар"
         if prompt == "q":
             break
 
-        lst_prompt = prompt.lower().split()
+        lst_prompt = prompt.strip().lower().split()
 
         if lst_prompt[1] == "and":
             text_processor.handle_and_operator(lst_prompt)
