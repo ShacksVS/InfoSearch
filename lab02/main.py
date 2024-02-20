@@ -10,9 +10,9 @@ if __name__ == "__main__":
     while running:
         try:
             # prompt = input("-> ")
-            prompt = "родині and народився"
+            # prompt = "родині and народився"
             # prompt = "родині or народився"
-            # prompt = "not beauty"
+            prompt = "not beauty"
             if prompt == "q":
                 break
 

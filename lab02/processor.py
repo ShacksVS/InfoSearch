@@ -23,13 +23,13 @@ class TextProcessor:
 
         for file_path in self.file_paths:
 
-            unique_words = self.clean_file(file_path)
-            words_in_file = self.count_words_in_file(unique_words)
+            cleaned_words = self.clean_file(file_path)
+            words_in_file = self.count_words_in_file(cleaned_words)
 
-            self.fill_matrix(unique_words, file_counter)
-            self.fill_inverted_index(unique_words, file_counter)
+            self.fill_matrix(cleaned_words, file_counter)
+            self.fill_inverted_index(cleaned_words, file_counter)
 
-            self.collection.update(unique_words)
+            self.collection.update(cleaned_words)
             self.total_words += words_in_file
             self.total_kb += os.path.getsize(file_path)
 
@@ -50,16 +50,15 @@ class TextProcessor:
     def count_words_in_file(self, cleaned_file: list) -> int:
         return len(cleaned_file)
 
-    def fill_matrix(self, unique_words, counter):
-        for word in unique_words:
+    def fill_matrix(self, words, counter):
+        for word in words:
             if word not in self.matrix:
-                # If the word is not in the matrix, initialize a list of zeros
                 self.matrix[word] = [0] * self.file_number
-            # Update the list to indicate the presence of the word in the current file
+            # if found word in file
             self.matrix[word][counter - 1] = 1
 
-    def fill_inverted_index(self, unique_words, counter):
-        for word in unique_words:
+    def fill_inverted_index(self, words, counter):
+        for word in words:
             if word not in self.inverted_index:
                 self.inverted_index[word] = []
 
@@ -93,11 +92,6 @@ class TextProcessor:
         print(f"Matrix size: {self.matrix_size / 1000} KB")
         print(f"Inverted index size: {self.inverted_index_size / 1000} KB")
 
-    def save_result(self, output_file="results.txt"):
-        with open(output_file, "w") as file:
-            for word in self.collection:
-                file.write(word + '\n')
-
     def handle_and_operator(self, prompt: list):
         first_word, second_word = prompt[0], prompt[2]
 
@@ -107,9 +101,7 @@ class TextProcessor:
 
         print(f"Finding {first_word} AND {second_word}..")
 
-        #
         # finding in matrix
-        #
 
         start_time_matrix = time.time()
 
@@ -121,19 +113,15 @@ class TextProcessor:
             else:
                 found_files_in_matrix.append(0)
 
-        # found_files_in_matrix = self.matrix[first_word] or self.matrix[second_word]
         time_matrix = (time.time() - start_time_matrix) * 1000  # convert to milliseconds
 
         print(found_files_in_matrix, time_matrix)
 
-        #
         # finding in inverted index
-        #
 
         start_time_inverted = time.time()
 
-        # using logical AND
-        found_files_in_inverted = list(set(self.inverted_index[first_word]) & set(self.inverted_index[second_word]))
+        found_files_in_inverted = set(self.inverted_index[first_word]).intersection(set(self.inverted_index[second_word]))
 
         time_inverted = (time.time() - start_time_inverted) * 1000  # convert to milliseconds
 
@@ -148,9 +136,7 @@ class TextProcessor:
 
         print(f"Finding {first_word} OR {second_word}..")
 
-        #
         # finding in matrix
-        #
 
         start_time_matrix = time.time()
 
@@ -166,14 +152,11 @@ class TextProcessor:
 
         print(found_files_in_matrix, time_matrix)
 
-        #
         # finding in inverted index
-        #
 
         start_time_inverted = time.time()
 
-        # using the logical OR operation
-        found_files_in_inverted = list(set(self.inverted_index[first_word]) | set(self.inverted_index[second_word]))
+        found_files_in_inverted = set(self.inverted_index[first_word]).union(set(self.inverted_index[second_word]))
 
         time_inverted = (time.time() - start_time_inverted) * 1000  # convert to milliseconds
 
@@ -184,9 +167,7 @@ class TextProcessor:
 
         print(f"Finding not {not_word}..")
 
-        #
         # finding in matrix
-        #
 
         start_time_matrix = time.time()
 
@@ -204,9 +185,7 @@ class TextProcessor:
 
         print(found_files_in_matrix, time_matrix)
 
-        #
         # finding in inverted index
-        #
 
         all_files = set(range(1, self.file_number + 1))
         start_time_inverted = time.time()

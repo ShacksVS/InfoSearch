@@ -64,8 +64,7 @@ class TwoWordsIndex:
         print(f"Total words in all files: {self.total_words}")
         print(f"Two words index size: {self.two_words_index_size / 1000} KB")
 
-
-    def find(self, words: str):
+    def search(self, words: str):
         start_time = time.time()
         found = self.two_words_dict[words]
         found_time = (time.time() - start_time) * 1000  # convert to milliseconds

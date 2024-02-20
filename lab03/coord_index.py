@@ -65,7 +65,7 @@ class CoordIndex:
         print(f"Total words in all files: {self.total_words}")
         print(f"Two words index size: {self.coord_index_size / 1000} KB")
 
-    def simple_search(self, words: str):
+    def coord_search(self, words: str):
         first_word, second_word = words.split(" ")
         print(first_word, second_word)
 
@@ -77,15 +77,14 @@ class CoordIndex:
 
         # Iterate through all unique doc_ids present in either found_first or found_second
         all_docs = set(found_first.keys()).union(found_second.keys())
-        
+
         for doc_id in all_docs:
 
             # Check if doc_id is present in both found_first and found_second
             if doc_id in found_first and doc_id in found_second:
                 first_positions = found_first[doc_id]
-
                 second_positions = found_second[doc_id]
-                # Look for positions in first_positions where the next position is in second_positions
+
                 sequence_positions = [(pos, pos + 1) for pos in first_positions if pos + 1 in second_positions]
 
                 if sequence_positions:
@@ -93,9 +92,7 @@ class CoordIndex:
 
         found_time = (time.time() - start_time) * 1000  # convert to milliseconds
 
-        print(f"\nFound '{first_word} {second_word}'"
-              f"\nin {sequence_found}"
-              f"\n\tin {found_time}")
+        print(f"\nFound '{first_word} {second_word}' in {found_time}")
 
-    def coord_search(self, word: str):
-        pass
+        for key, value in sequence_found.items():
+            print(f"{key} -> {value}")
